@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Enemy
+  - TowerPlace
+  - enemypath
+  - spawn
+  - rightturn
+  - leftturn
+  - home
+  - Canvas
+  - archerTower
+  - wizardTower
+  - barrackTower
+  - Knight
+  - menu
+  - destroy
+  - ArcherLv1
+  - BarrackLv1
+  - WizardLv1
+  - ArcherLv2
+  - BarrackLv2
+  - WizardLv2
+  - ArcherLv3
+  - BarrackLv3
+  - WizardLv3
+  - upgrade
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - test
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: New Layer 1
+    uniqueID: 4152375781
+    locked: 0
+  - name: New Layer 2
+    uniqueID: 1650306179
+    locked: 0

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e37b001d7578aa24aa4c1ae8b82f0a17
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - tileMap: {instanceID: 0}
+  - towerBuildMenuPrefab: {fileID: 3392913580925028068, guid: 4aa6df54f0223b64fae8400e07bb3ad5, type: 3}
+  - towerBuildMenu: {fileID: 3392913580925028068, guid: 4aa6df54f0223b64fae8400e07bb3ad5, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
