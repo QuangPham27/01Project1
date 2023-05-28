@@ -23,13 +23,24 @@ public class BarrackSpawn : MonoBehaviour
 
     void Start()
     {
-        towerID = new System.Random().Next(1, 1001);
-        towerBox = GetComponent<TowerDetection>();
-        boxCollider = towerBox.Range.GetComponent<CircleCollider2D>();
-        Spawnpos = towerBox.FiringPos;
+        try
+        {
+            towerID = new System.Random().Next(1, 1001);
+            towerBox = GetComponent<TowerDetection>();
+            boxCollider = towerBox.Range.GetComponent<CircleCollider2D>();
+            Spawnpos = towerBox.FiringPos;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error in BarrackSpawn.Start(): {e}");
+            // Handle the exception (e.g., display an error message)
+        }
     }
+
     public void SpawnKnight()
     {
+        try
+        {
             GameObject closestEnemyPath = gameObject.GetComponent<FindClosest>().FindClosestPath();
             if (closestEnemyPath != null)
             {
@@ -47,15 +58,29 @@ public class BarrackSpawn : MonoBehaviour
                     knightCount++;
                 }
             }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error in BarrackSpawn.SpawnKnight(): {e}");
+            // Handle the exception (e.g., display an error message)
+        }
     }
+
 
     public void OnKnightDeath(KnightDeathMessage msg)
     {
-        // If the message tower ID matches this tower's ID, respawn the knight
-        if (msg.towerID == towerID)
+        try
         {
-            Debug.Log($"Respawning knight for tower {msg.towerID}");
-            StartCoroutine(SpawnKnightWithDelay(5f));
+            if (msg.towerID == towerID)
+            {
+                Debug.Log($"Respawning knight for tower {msg.towerID}");
+                StartCoroutine(SpawnKnightWithDelay(5f));
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error in BarrackSpawn.OnKnightDeath(): {e}");
+            // Handle the exception (e.g., display an error message)
         }
     }
 

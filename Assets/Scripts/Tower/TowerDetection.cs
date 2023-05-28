@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -23,43 +24,54 @@ public class TowerDetection : MonoBehaviour
 
     void Start()
     {
-        rend = Range.GetComponent<Renderer>();
-        Color color = rend.material.color;
-        color.a = 0.0f;
-        rend.material.color = color;
-        //timer = attackcooldown;
-        tower = this.gameObject.name;
+        try
+        {
+            rend = Range.GetComponent<Renderer>();
+            Color color = rend.material.color;
+            color.a = 0.0f;
+            rend.material.color = color;
+            tower = gameObject.name;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error in TowerDetection.Start(): {e}");
+            // Handle the exception (e.g., display an error message)
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        if (tower.ContainsInsensitive("archer")) 
+        try
         {
-            gameObject.GetComponent<ArcherAttack>().SpawnArrow();
-        } 
-        
-        else if (tower.ContainsInsensitive("wizard")){
-            gameObject.GetComponent<WizardAttack>().SpawnMagic();
+            if (tower.ContainsInsensitive("archer"))
+            {
+                gameObject.GetComponent<ArcherAttack>().SpawnArrow();
+            }
+            else if (tower.ContainsInsensitive("wizard"))
+            {
+                gameObject.GetComponent<WizardAttack>().SpawnMagic();
+            }
+            else if (tower.ContainsInsensitive("barrack") && count < 3)
+            {
+                if (firstspawn == false)
+                {
+                    gameObject.GetComponent<BarrackSpawn>().SpawnKnight();
+                    firstspawn = true;
+                    count++;
+                }
+                else
+                {
+                    StartCoroutine(SpawnDelay(delay));
+                    count++;
+                }
+            }
         }
-        else if (tower.ContainsInsensitive("barrack") && count < 3)
+        catch (Exception e)
         {
-            if (firstspawn == false)
-            {
-                gameObject.GetComponent<BarrackSpawn>().SpawnKnight();
-                firstspawn = true;
-                count++;
-            }
-            else
-            {
-                StartCoroutine(SpawnDelay(delay));
-                count++;
-            }
-
-
+            Debug.LogError($"Error in TowerDetection.Update(): {e}");
+            // Handle the exception (e.g., display an error message)
         }
-
     }
 
     private IEnumerator SpawnDelay(float delay)
