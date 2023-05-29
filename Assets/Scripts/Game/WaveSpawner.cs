@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +16,10 @@ public class Wave
 
 public class WaveSpawner : MonoBehaviour
 {
+    Queue<Wave> waveQueue;
+
+
+
     public Player player;
     public LevelComplete levelComplete;
     public int currentLevel;
@@ -32,17 +38,34 @@ public class WaveSpawner : MonoBehaviour
 
     private void Start()
     {
+        waveQueue = new Queue<Wave>();
+        for (int i = 0; i<waves.Length ; i++)
+        {
+            waveQueue.Enqueue(waves[i]);
+        }
+
+
+
         waveTimerCoroutine = WaveTimer(); // create the wave timer coroutine
+
+        currentWave = waveQueue.Dequeue();
+
+
     }
 
     private void Update()
     {
-        currentWave = waves[currentWaveNumber];
+
+      
+
+        
         SpawnWave();
         GameObject[] totalEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+         
         if (totalEnemies.Length == 0 && canAnimate)
         {
             if (currentWaveNumber + 1 != waves.Length)
+           // if (currentWaveNumber + 1 != waveQueue.Count())
             {
                 //waveName.text = waves[currentWaveNumber + 1].waveName;
                 //animator.SetTrigger("WaveComplete");
@@ -54,7 +77,9 @@ public class WaveSpawner : MonoBehaviour
             {
                 CompleteLevel();
             }
-        }
+            }
+         
+        
     }
 
     void SpawnWave()
@@ -77,12 +102,28 @@ public class WaveSpawner : MonoBehaviour
     IEnumerator WaveTimer()
     {
         yield return new WaitForSeconds(currentWave.waveTimer);
-        currentWaveNumber++;
-        canSpawn = true;
-        canAnimate = false;
+        if (waveQueue.Count()>0)
+        {
+            currentWave = waveQueue.Dequeue();
+            //currentWaveNumber++;
+            canSpawn = true;
+            canAnimate = false;
+        }
+        else
+        {
+            
+            CompleteLevel();
+           
+        }
+         
+       
+
+         
     }
     void CompleteLevel()
     {
+        canSpawn = false;
+        canAnimate = false;
         levelComplete.Setup();
         if (player.MaxHealth == player.Health) {
             levelComplete.levelStars = 3;
