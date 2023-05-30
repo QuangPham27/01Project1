@@ -39,7 +39,7 @@ public class WaveSpawner : MonoBehaviour
     private void Start()
     {
         waveQueue = new Queue<Wave>();
-        for (int i = 0; i<waves.Length ; i++)
+        for (int i = 0; i < waves.Length; i++)
         {
             waveQueue.Enqueue(waves[i]);
         }
@@ -56,30 +56,30 @@ public class WaveSpawner : MonoBehaviour
     private void Update()
     {
 
-      
 
-        
+
+
         SpawnWave();
         GameObject[] totalEnemies = GameObject.FindGameObjectsWithTag("Enemy");
-         
+
         if (totalEnemies.Length == 0 && canAnimate)
         {
             if (currentWaveNumber + 1 != waves.Length)
-           // if (currentWaveNumber + 1 != waveQueue.Count())
+            // if (currentWaveNumber + 1 != waveQueue.Count())
             {
                 //waveName.text = waves[currentWaveNumber + 1].waveName;
                 //animator.SetTrigger("WaveComplete");
                 canAnimate = false;
-                waveTimerCoroutine = WaveTimer();
+                waveTimerCoroutine = WaveTimer();///Use queue to wait next wave
                 StartCoroutine(waveTimerCoroutine); // start the wave timer coroutine
             }
             else
             {
                 CompleteLevel();
             }
-            }
-         
-        
+        }
+
+
     }
 
     void SpawnWave()
@@ -102,35 +102,38 @@ public class WaveSpawner : MonoBehaviour
     IEnumerator WaveTimer()
     {
         yield return new WaitForSeconds(currentWave.waveTimer);
-        if (waveQueue.Count()>0)
+        if (waveQueue.Count() > 0)
         {
             currentWave = waveQueue.Dequeue();
-            //currentWaveNumber++;
+            currentWaveNumber++;
             canSpawn = true;
             canAnimate = false;
         }
         else
         {
-            
-            CompleteLevel();
-           
-        }
-         
-       
 
-         
+            CompleteLevel();
+
+        }
+
+
+
+
     }
     void CompleteLevel()
     {
         canSpawn = false;
         canAnimate = false;
         levelComplete.Setup();
-        if (player.MaxHealth == player.Health) {
+        if (player.MaxHealth == player.Health)
+        {
             levelComplete.levelStars = 3;
-        } else if (player.MaxHealth > player.Health && player.Health > player.MaxHealth/2)
+        }
+        else if (player.MaxHealth > player.Health && player.Health > player.MaxHealth / 2)
         {
             levelComplete.levelStars = 2;
-        } else levelComplete.levelStars = 1;
+        }
+        else levelComplete.levelStars = 1;
         int clearedLevels = PlayerPrefs.GetInt("levelsUnlocked");//1
         int levelStarClear = levelComplete.levelStars;
         PlayerPrefs.SetInt("starClear", levelStarClear);//3
