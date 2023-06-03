@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SearchService;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 using static UnityEngine.GraphicsBuffer;
 
 public class MushroomAttack : MonoBehaviour
@@ -52,7 +54,11 @@ public class MushroomAttack : MonoBehaviour
             {
                 healthSystem = attacker.GetComponent<HealthSystem>();
                 attacker.GetComponent<KnightMovement>().engagedTarget = gameObject;
-                GetComponent<NavMeshAgent>().isStopped = true;
+                if (SceneManager.GetActiveScene().name != "GuideScene1")
+                {
+                    GetComponent<NavMeshAgent>().isStopped = true;
+                }
+                
                 if (transform.position == attacker.transform.position)
                 {
                     attack();
