@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,21 +10,32 @@ public class BackgroundMusic : MonoBehaviour
 
     private void Start()
     {
-        // still play music if the screen name is not "Options"
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Options")
+        try
         {
-            SeemlessBackgroundMusic.Instance.gameObject.GetComponent<AudioSource>().Play();
-        }
-        else
+            // still play music if the screen name is not "Options"
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Options")
+            {
+                SeemlessBackgroundMusic.Instance.gameObject.GetComponent<AudioSource>().Play();
+            }
+            else
+            {
+                SeemlessBackgroundMusic.Instance.gameObject.GetComponent<AudioSource>().Pause();
+            }
+        } catch (Exception ex)
         {
-            SeemlessBackgroundMusic.Instance.gameObject.GetComponent<AudioSource>().Pause();
+            Debug.Log(ex.Message);
         }
-
     }
 
     private void OnDisable()
     {
-        SeemlessBackgroundMusic.Instance.gameObject.GetComponent<AudioSource>().Play();
+        try
+        {
+            SeemlessBackgroundMusic.Instance.gameObject.GetComponent<AudioSource>().Play();
+        } catch (Exception ex)
+        {
+            Debug.Log(ex.Message);
+        }
     }
 
     public void ToggleMusic()
