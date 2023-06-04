@@ -38,13 +38,12 @@ public class BuildScript : MonoBehaviour
     int currentTowerGoldRefund;
     Vector3 towerPosition;
 
-
+    private BuildTowerFactory towerFactory;
+    private TowerUpgradeFactory towerUpgradeFactory;
+    private TowerDestroyFactory towerDestroyFactory;
     private int towerID;
     private GameObject[] Knights;
 
-    private Vector3 archerTowerOffset = new Vector3(0, (float)0.5, 0);
-    private Vector3 wizardTowerOffset = new Vector3(0, (float)0.25, 0);
-    private Vector3 barrackTowerOffset = new Vector3(0, (float)0.5, 0);
     // Start is called before the first frame update
     void Start()
     {
@@ -68,44 +67,19 @@ public class BuildScript : MonoBehaviour
                         SpawnMenu(hit, clickPosition, towerBuildMenuPrefab);
                         break;
                     case "archerTower":
-                        BuildTower(archerTower, towerPosition, archerTowerOffset, goldValues.archer1Price);
-                        currentTowerGoldRefund = goldValues.archer1Price;
+                        towerFactory = new BuildArcherFactory() { archerTowerPrefab = archerTower };
+                        BuildTower(towerFactory, towerPosition, goldValues.archer1Price);
                         break;
                     case "wizardTower":
-                        BuildTower(wizardTower, towerPosition, wizardTowerOffset, goldValues.wizard1Price);
-                        currentTowerGoldRefund = goldValues.wizard1Price;
+                        towerFactory = new BuildWizardFactory() { wizardTowerPrefab = wizardTower };
+                        BuildTower(towerFactory, towerPosition, goldValues.wizard1Price);
                         break;
                     case "barrackTower":
-                        BuildTower(barrackTower, towerPosition, barrackTowerOffset, goldValues.barrack1Price);
-                        currentTowerGoldRefund = goldValues.barrack1Price;
+                        towerFactory = new BuildBarrackFactory() { barrackTowerPrefab = barrackTower };
+                        BuildTower(towerFactory, towerPosition, goldValues.barrack1Price);
                         break;
                     case "destroy":
-                        if (currentTower.name.ContainsInsensitive("barrack"))
-                        {
-                            if (currentTower.GetComponent<BarrackSpawn>().towerID > 0)
-                            {
-                                towerID = currentTower.GetComponent<BarrackSpawn>().towerID;
-
-                                // Destroy all knights with the matching tower ID
-                                Knights = GameObject.FindGameObjectsWithTag("Knight");
-                                foreach (GameObject knight in Knights)
-                                {
-                                    if (knight.GetComponent<KnightMovement>().towerID == towerID)
-                                    {
-                                        if (knight.GetComponent<KnightMovement>().engagedTarget != null)
-                                        {
-                                            knight.GetComponent<KnightMovement>().engagedTarget.GetComponent<NavMeshAgent>().isStopped = false;
-                                            knight.GetComponent<KnightMovement>().engagedTarget.GetComponent<MushroomAttack>().inCombat = false;
-                                            knight.GetComponent<KnightMovement>().engagedTarget.GetComponent<MushroomAttack>().attacker = null;
-                                        }
-                                        Destroy(knight.gameObject);
-                                    }
-                                }
-                            }
-                        }
-
-                        player.Gold += currentTowerGoldRefund * 60 / 100;
-                        Destroy(currentTower);
+                        DestroyTower(currentTower);
                         break;
                     case "upgrade":
                         if (!checkEnoughGoldToUpgrade(currentTower)) break;
@@ -189,11 +163,35 @@ public class BuildScript : MonoBehaviour
         return true;
     }
 
-    private void BuildTower(GameObject buildTower, Vector3 towerPosition, Vector3 towerOffset, int price)
+    private void DestroyTower(GameObject currentTower)
+    {
+        player.Gold += currentTowerGoldRefund * 60 / 100;
+        string tower = currentTower.name;
+        if (tower.ContainsInsensitive("barrack"))
+        {
+            towerDestroyFactory = new BarrackDestroyFactory();
+            towerID = currentTower.GetComponent<BarrackSpawn>().towerID;
+            Knights = GameObject.FindGameObjectsWithTag("Knight");
+            towerDestroyFactory.DestroyTower(currentTower, Knights, towerID);
+            return;
+        }
+        if (tower.ContainsInsensitive("archer"))
+        {
+            towerDestroyFactory = new ArcherDestroyFactory();
+            towerDestroyFactory.DestroyTower(currentTower, null, 0);
+            return;
+        }
+        if (tower.ContainsInsensitive("wizard"))
+        {
+            towerDestroyFactory = new WizardDestroyFactory();
+            towerDestroyFactory.DestroyTower(currentTower, null, 0);
+            return;
+        }
+    }
+    private void BuildTower(BuildTowerFactory factory, Vector3 towerPosition,  int price)
     {
         if (player.Gold < price) return;
-        GameObject tower = Instantiate(buildTower, towerPosition + towerOffset, Quaternion.identity);
-        tower.transform.localScale = new Vector3((float)1.25, (float)1.25, (float)1.25);
+        GameObject tower = factory.CreateTower(towerPosition);
         player.Gold -= price;
     }
 
@@ -244,72 +242,35 @@ public class BuildScript : MonoBehaviour
 
     private void UpgradeTower(GameObject currentTower)
     {
-        Vector3 position = currentTower.transform.position;
         switch (currentTower.tag)
         {
             case "ArcherLv1":
-                Destroy(currentTower);
-                _ = Instantiate(archerTower2, position, Quaternion.identity)
-                    .transform.localScale = new Vector3((float)1.25, (float)1.25, (float)1.25);
+                towerUpgradeFactory = new ArcherUpgradeFactory() { upgradedArcherTowerPrefab = archerTower2 };
+                towerUpgradeFactory.UpgradeTower(currentTower,null,0);
                 break;
             case "BarrackLv1":
+                towerUpgradeFactory = new BarrackUpgradeFactory() { upgradedBarrackTowerPrefab = barrackTower2 };
                 towerID = currentTower.GetComponent<BarrackSpawn>().towerID;
-
-                // Destroy all knights with the matching tower ID
                 Knights = GameObject.FindGameObjectsWithTag("Knight");
-                foreach (GameObject knight in Knights)
-                {
-                    if (knight.GetComponent<KnightMovement>().towerID == towerID)
-                    {
-                        if (knight.GetComponent<KnightMovement>().engagedTarget != null)
-                        {
-                            knight.GetComponent<KnightMovement>().engagedTarget.GetComponent<NavMeshAgent>().isStopped = false;
-                            knight.GetComponent<KnightMovement>().engagedTarget.GetComponent<MushroomAttack>().inCombat = false;
-                            knight.GetComponent<KnightMovement>().engagedTarget.GetComponent<MushroomAttack>().attacker = null;
-                        }
-                        Destroy(knight.gameObject);
-                    }
-                }
-                Destroy(currentTower);
-                _ = Instantiate(barrackTower2, position, Quaternion.identity)
-                    .transform.localScale = new Vector3((float)1.25, (float)1.25, (float)1.25);
+                towerUpgradeFactory.UpgradeTower(currentTower, Knights, towerID);
                 break;
             case "WizardLv1":
-                Destroy(currentTower);
-                _ = Instantiate(wizardTower2, position, Quaternion.identity)
-                    .transform.localScale = new Vector3((float)1.25, (float)1.25, (float)1.25);
+                towerUpgradeFactory = new WizardUpgradeFactory() { upgradedWizardTowerPrefab = wizardTower2 };
+                towerUpgradeFactory.UpgradeTower(currentTower, null, 0);
                 break;
             case "ArcherLv2":
-                Destroy(currentTower);
-                _ = Instantiate(archerTower3, position, Quaternion.identity)
-                    .transform.localScale = new Vector3((float)1.25, (float)1.25, (float)1.25);
+                towerUpgradeFactory = new ArcherUpgradeFactory() { upgradedArcherTowerPrefab = archerTower3 };
+                towerUpgradeFactory.UpgradeTower(currentTower, null, 0);
                 break;
             case "BarrackLv2":
+                towerUpgradeFactory = new BarrackUpgradeFactory() { upgradedBarrackTowerPrefab = barrackTower3 };
                 towerID = currentTower.GetComponent<BarrackSpawn>().towerID;
-
-                // Destroy all knights with the matching tower ID
                 Knights = GameObject.FindGameObjectsWithTag("Knight");
-                foreach (GameObject knight in Knights)
-                {
-                    if (knight.GetComponent<KnightMovement>().towerID == towerID)
-                    {
-                        if (knight.GetComponent<KnightMovement>().engagedTarget != null)
-                        {
-                            knight.GetComponent<KnightMovement>().engagedTarget.GetComponent<NavMeshAgent>().isStopped = false;
-                            knight.GetComponent<KnightMovement>().engagedTarget.GetComponent<MushroomAttack>().inCombat = false;
-                            knight.GetComponent<KnightMovement>().engagedTarget.GetComponent<MushroomAttack>().attacker = null;
-                        }
-                        Destroy(knight.gameObject);
-                    }
-                }
-                Destroy(currentTower);
-                _ = Instantiate(barrackTower3, position, Quaternion.identity)
-                    .transform.localScale = new Vector3((float)1.25, (float)1.25, (float)1.25);
+                towerUpgradeFactory.UpgradeTower(currentTower, Knights, towerID);
                 break;
             case "WizardLv2":
-                Destroy(currentTower);
-                _ = Instantiate(wizardTower3, position, Quaternion.identity)
-                    .transform.localScale = new Vector3((float)1.25, (float)1.25, (float)1.25);
+                towerUpgradeFactory = new WizardUpgradeFactory() { upgradedWizardTowerPrefab = wizardTower3 };
+                towerUpgradeFactory.UpgradeTower(currentTower, null, 0);
                 break;
         }
     }
