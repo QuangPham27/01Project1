@@ -2830,6 +2830,8 @@ MonoBehaviour:
   - {fileID: 674158928}
   - {fileID: 149635820}
   maxStars: 3
+  starClears: 
+  unlockedLevelsNumber: 0
   yellowStar: {fileID: 21300000, guid: 2091b3e11910ac54fb0e1f6abba80d91, type: 3}
 --- !u!1 &1438049665
 GameObject:

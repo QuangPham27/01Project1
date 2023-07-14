@@ -38,6 +38,7 @@ public class WaveSpawner : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log(currentLevel);
         waveQueue = new Queue<Wave>();
         for (int i = 0; i < waves.Length; i++)
         {
@@ -134,9 +135,7 @@ public class WaveSpawner : MonoBehaviour
             levelComplete.levelStars = 2;
         }
         else levelComplete.levelStars = 1;
-        int clearedLevels = PlayerPrefs.GetInt("levelsUnlocked");//1
         int levelStarClear = levelComplete.levelStars;
-        PlayerPrefs.SetInt("starClear", levelStarClear);//3
-        PlayerPrefs.SetInt("currentLevel", currentLevel);//1
+        LevelUnlockHandler.Instance.LevelCleared(currentLevel, levelStarClear);
     }
 }

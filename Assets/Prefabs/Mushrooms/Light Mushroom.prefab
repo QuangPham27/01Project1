@@ -304,6 +304,7 @@ GameObject:
   - component: {fileID: -4407617866799410276}
   - component: {fileID: 344899618018953461}
   - component: {fileID: 638428196011843962}
+  - component: {fileID: 5528976033924706825}
   m_Layer: 0
   m_Name: Light Mushroom
   m_TagString: Enemy
@@ -493,8 +494,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd760da86548936429566525206316f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackSpeed: 0.8
-  attackDmg: 3
+  enemy: {fileID: 5528976033924706825}
   Gold: 15
   attacker: {fileID: 0}
   inCombat: 0
@@ -668,6 +668,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d8696a268e58c84bb2f40e1ac6b167c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Mushrooms: {fileID: 0}
 --- !u!114 &344899618018953461
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -777,6 +778,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &5528976033924706825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6406438654339536426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d094ebc944e0c94fb0b1b1ad206726c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 75
+  healthMax: 75
+  attackSpeed: 0.8
+  attackDmg: 3
+  Gold: 15
 --- !u!1 &6406438654614302539
 GameObject:
   m_ObjectHideFlags: 0
